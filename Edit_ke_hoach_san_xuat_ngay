@@ -1,0 +1,921 @@
+<root>
+	<Tables>
+		<ParentTable>
+			<ColumnChanging>
+				<CurrencyCode>
+					<Evaluator_ExchangeRate_ResetIfChangeByUser>
+						<DataMember>ExchangeRate_Currency,ExchangeRate</DataMember>
+						<Value>NULL</Value>
+					</Evaluator_ExchangeRate_ResetIfChangeByUser>
+				</CurrencyCode>
+				<CustomerCode>
+					<Evaluator_Controls_ResetValueIfChange>
+						<DataMember>ContactPerson,Address</DataMember>
+						<Value>NULL</Value>
+					</Evaluator_Controls_ResetValueIfChange>
+				</CustomerCode>
+			</ColumnChanging>
+			<ColumnChanged>
+				<TypePs>
+					<Evaluator_TypePs_ResetIfChangeByUser>
+						<DataMember>DocNo</DataMember>
+						<Value>NULL</Value>
+						<stopWhen>Deleted</stopWhen>
+					</Evaluator_TypePs_ResetIfChangeByUser>
+				</TypePs>
+				<CurrencyCode>
+					<Evaluator_Controls_Format>
+						<Name>grdChild_ChildTable_Detail.OriginalAmount9.OriginalAmount3</Name>
+						<DataMember>_OriginalAmount,_OriginalAmount3,_TotalOriginalAmount</DataMember>
+						<Format>IIF(CurrencyCode='{VAR=M_Ma_Tte0}','C','')</Format>
+					</Evaluator_Controls_Format>
+					<Evaluator_Controls_Visible>
+						<Name>grdChild_ChildTable_Detail.Amount9.Amount3</Name>
+						<DataMember>_Amount,_Amount3,_TotalAmount</DataMember>
+						<Visible>CurrencyCode&lt;&gt;'{VAR=M_Ma_Tte0}'</Visible>
+					</Evaluator_Controls_Visible>
+					<Evaluator_Enable_ExchangeRate>
+						<DataMember>ExchangeRate</DataMember>
+						<Enabled>CurrencyCode&lt;&gt;'{VAR=M_Ma_Tte0}'</Enabled>
+					</Evaluator_Enable_ExchangeRate>
+				</CurrencyCode>
+				<IsRevisedPlan>
+					<Evaluator_UpdateFromParentUnderChild />
+					<Evaluator_BizDocId_PS_VisibleWhen>
+						<Name>grdChild_ChildTable_Detail.BizDocId_PS</Name>
+						<Visible>ISNULL(IsRevisedPlan,0)=1</Visible>
+					</Evaluator_BizDocId_PS_VisibleWhen>
+				</IsRevisedPlan>
+				<ExchangeRate_Currency>
+					<Evaluator_ExchangeRate_DefaultValue />
+				</ExchangeRate_Currency>
+				<ExchangeRate>
+					<EvaluatorGroup_ExchangeRate_Recalculate />
+				</ExchangeRate>
+				<IsCancelled>
+					<EvaluatorGroup_IsActive_AutoValue>
+						<DataMember>IsActive</DataMember>
+						<Value>IIF(IsCancelled=1,0,1)</Value>
+					</EvaluatorGroup_IsActive_AutoValue>
+				</IsCancelled>
+			</ColumnChanged>
+			<Evaluators>
+				<Groups>
+					<EvaluatorGroup_ExchangeRate_Recalculate>
+						<Evaluator_ExchangeRate_DefaultValue>
+							<DataMember>ExchangeRate</DataMember>
+							<Expr>ISNULL(ExchangeRate,0)=0</Expr>
+							<Value>ExchangeRate_Currency</Value>
+						</Evaluator_ExchangeRate_DefaultValue>
+						<Evaluator_BizDocDetail_Amount9_ResetValue />
+						<Evaluator_BizDocDetail_Amount9 />
+						<Evaluator_BizDocDetail_Amount_ResetValue />
+						<Evaluator_BizDocDetail_Amount />
+						<Evaluator_BizDocDetail_Amount3_ResetValue />
+						<Evaluator_BizDocDetail_Amount3 />
+					</EvaluatorGroup_ExchangeRate_Recalculate>
+				</Groups>
+			</Evaluators>
+			<Expressions>
+				<_OriginalAmount>SUM(Child(vB30BizDocDetail_EditPS).OriginalAmount)</_OriginalAmount>
+				<_OriginalAmount3>SUM(Child(vB30BizDocDetail_EditPS).OriginalAmount3)</_OriginalAmount3>
+				<_TotalOriginalAmount>_OriginalAmount+_OriginalAmount3</_TotalOriginalAmount>
+				<_Amount>SUM(Child(vB30BizDocDetail_EditPS).Amount)</_Amount>
+				<_Amount3>SUM(Child(vB30BizDocDetail_EditPS).Amount3)</_Amount3>
+				<_TotalAmount>_Amount+_Amount3</_TotalAmount>
+				<Ma_Ct>DocCode</Ma_Ct>
+			</Expressions>
+			<ServerConstraints>
+				<DefaultDocNo>
+					<ConstraintKey>BranchCode,@BizDocId,@DocCode,DocDate,@IsTemp,DocNo,TypePs</ConstraintKey>
+					<Command>ufn_B30BizDoc_DefaultDocNoBizDocPs</Command>
+					<DataMember>DocNo</DataMember>
+					<Expr>ISNULL(DocNo,'')=''</Expr>
+				</DefaultDocNo>
+				<B30BizDoc_Check_Unique_DocNo>
+					<ConstraintKey>BranchCode,@BizDocId,@DocCode,DocNo,@IsTemp,TypePs</ConstraintKey>
+					<Command>ufn_B30BizDoc_CheckUniqueDocNoPS</Command>
+					<IgnoreError>1</IgnoreError>
+					<Expr>LEN(TRIM(ISNULL(DocNo,'')))&gt;0</Expr>
+					<Text>
+						<Vietnamese>Số chứng từ phải duy nhất.</Vietnamese>
+						<English>The number of vouchers are unique.</English>
+						<Japanese>文書番号は一意である必要があります。</Japanese>
+						<Chinese>证件号码必须是唯一的。</Chinese>
+						<Custom>그 문서 번호 고유해야 합니다.</Custom>
+						<French />
+					</Text>
+				</B30BizDoc_Check_Unique_DocNo>
+				<DefaultExchangeRate>
+					<Command>ufn_B20Currency_GetExchangeRate</Command>
+					<ConstraintKey>DocDate,Id_Currency</ConstraintKey>
+					<DataMember>ExchangeRate_Currency</DataMember>
+				</DefaultExchangeRate>
+			</ServerConstraints>
+			<DefaultValues>
+				<ExchangeRateOperator>1</ExchangeRateOperator>
+				<DecimalRound>0</DecimalRound>
+				<BranchCode>{VAR=User.Don_Vi}</BranchCode>
+				<IsTemp>1</IsTemp>
+				<CustomerCode>A03-BBDD</CustomerCode>
+			</DefaultValues>
+			<ValidateRules>
+				<EmployeeCodeRule>TRue</EmployeeCodeRule>
+				<DeptCodeRule>True</DeptCodeRule>
+			</ValidateRules>
+		</ParentTable>
+		<ChildTable_Detail>
+			<Name>vB30BizDocDetail_EditPS</Name>
+			<Sort>BuiltinOrder</Sort>
+			<ParentKey>BizDocId</ParentKey>
+			<ChildKey>BizDocId</ChildKey>
+			<MinRowNumber>1</MinRowNumber>
+			<ServerConstraints>
+				<CheckDate>
+					<ConstraintKey>DocDate,EstimatedTimeDelivery</ConstraintKey>
+					<Command>ufn_CheckDates</Command>
+					<IgnoreError>0</IgnoreError>
+					<Text>
+						<Vietnamese>Kiểm tra ngày</Vietnamese>
+						<English>Check out day</English>
+						<French />
+						<Japanese />
+						<Chinese />
+						<Custom />
+					</Text>
+				</CheckDate>
+				<GetYeuCau>
+					<Command>ufn_B30BizDocDetail_KHSX_YeuCau</Command>
+					<ConstraintKey>_BranchCode,SttLSanXuat,ItemCode</ConstraintKey>
+					<DataMember>RequestQuantity</DataMember>
+					<Expr>ISNULL(SttLSanXuat,'')&lt;&gt;'' AND ISNULL(ItemCode,'')&lt;&gt;''</Expr>
+				</GetYeuCau>
+				<LuyKe>
+					<Command>ufn_B30BizDocDetail_KHSX_LuyKe</Command>
+					<ConstraintKey>_BranchCode,SttLSanXuat,ItemCode,DocDate</ConstraintKey>
+					<DataMember>ReceiptQuantity</DataMember>
+					<Expr>ISNULL(SttLSanXuat,'')&lt;&gt;'' AND ISNULL(ItemCode,'')&lt;&gt;''</Expr>
+				</LuyKe>
+				<GhiChu_Note>
+					<Command>ufn_B30BizDocDetail_KHSX_Status</Command>
+					<ConstraintKey>_BranchCode,SttLSanXuat,ItemCode,DocDate</ConstraintKey>
+					<DataMember>Remark</DataMember>
+					<Expr>ISNULL(SttLSanXuat,'')&lt;&gt;'' AND ISNULL(ItemCode,'')&lt;&gt;''</Expr>
+				</GhiChu_Note>
+			</ServerConstraints>
+			<ValidateRules>
+				<BizDocId_PSRules>ISNULL(IsRevisedPlan,0)=1</BizDocId_PSRules>
+			</ValidateRules>
+			<Expressions>
+				<ExchangeRateOperator>PARENT.ExchangeRateOperator</ExchangeRateOperator>
+				<DecimalRound>PARENT.DecimalRound</DecimalRound>
+				<_CustomerCode>PARENT.CustomerCode</_CustomerCode>
+				<_DocDate>PARENT.DocDate</_DocDate>
+				<_BranchCode>PARENT.BranchCode</_BranchCode>
+			</Expressions>
+			<ColumnChanging>
+				<ItemCode>
+					<Evaluator_TempCol_ItemCode>
+						<DataMember>_TempCol</DataMember>
+						<Value>'ItemCode'</Value>
+					</Evaluator_TempCol_ItemCode>
+					<Evaluator_Unit_ResetValue>
+						<DataMember>Unit</DataMember>
+						<Value>NULL</Value>
+					</Evaluator_Unit_ResetValue>
+					<Evaluator_BizDocDetail_TempCol_Reset />
+				</ItemCode>
+				<Name_Item>
+					<Evaluator_TempCol_Name_Item>
+						<DataMember>_TempCol</DataMember>
+						<Value>'Name_Item'</Value>
+					</Evaluator_TempCol_Name_Item>
+					<Evaluator_Description0_ResetValue>
+						<DataMember>Description0</DataMember>
+						<Value>NULL</Value>
+					</Evaluator_Description0_ResetValue>
+					<Evaluator_BizDocDetail_TempCol_Reset />
+				</Name_Item>
+				<!-- 23/3/2015: Thăng sửa cho phép gõ lại Tiền thuế -->
+				<TaxType>
+					<Evaluator_BizDocDetail_OriginalAmount3_ResetEmpty>
+						<DataMember>OriginalAmount3</DataMember>
+						<Value>NULL</Value>
+					</Evaluator_BizDocDetail_OriginalAmount3_ResetEmpty>
+					<Evaluator_BizDocDetail_Amount3_ResetEmpty>
+						<DataMember>Amount3</DataMember>
+						<Value>NULL</Value>
+					</Evaluator_BizDocDetail_Amount3_ResetEmpty>
+				</TaxType>
+			</ColumnChanging>
+			<ColumnChanged>
+				<ItemCode>
+					<Evaluator_Detail_DocDate_DefaultValueFromParent />
+				</ItemCode>
+				<IsRevisedPlan>
+					<Evaluator_UpdateFromParentUnderChild />
+					<Evaluator_ResetValueWhen0>
+						<DataMember>BizDocId_PS</DataMember>
+						<Value>NULL</Value>
+						<Expr>ISNULL(IsRevisedPlan,0)=0</Expr>
+					</Evaluator_ResetValueWhen0>
+				</IsRevisedPlan>
+				<Unit_Item>
+					<Evaluator_BizDocDetail_Unit_DefaultValue />
+				</Unit_Item>
+				<Name_Item>
+					<Evaluator_BizDocDetail_Description0_DefaultValue />
+				</Name_Item>
+				<Description0>
+					<Evaluator_BizDocDetail_Description0_DefaultValue />
+				</Description0>
+				<Unit>
+					<Evaluator_BizDocDetail_Unit_DefaultValue />
+					<Evaluator_BizDocDetail_ConvertRate9 />
+				</Unit>
+				<OriginalUnitCost>
+					<Evaluator_BizDocDetail_OriginalUnitCost />
+					<Evaluator_BizDocDetail_OriginalAmount9 />
+				</OriginalUnitCost>
+				<ConvertRate9>
+					<Evaluator_BizDocDetail_Quantity />
+				</ConvertRate9>
+				<Quantity9>
+					<Evaluator_BizDocDetail_OriginalAmount9 />
+					<Evaluator_BizDocDetail_Quantity />
+				</Quantity9>
+				<OriginalAmount9>
+					<Evaluator_BizDocDetail_OriginalUnitCost />
+					<Evaluator_BizDocDetail_OriginalAmount9 />
+					<Evaluator_BizDocDetail_OriginalAmount_ResetValue />
+					<Evaluator_BizDocDetail_OriginalAmount />
+					<Evaluator_BizDocDetail_Amount9_ResetValue />
+					<Evaluator_BizDocDetail_Amount9 />
+					<Evaluator_BizDocDetail_OriginalAmount3 />
+				</OriginalAmount9>
+				<Amount9>
+					<Evaluator_BizDocDetail_Amount9 />
+					<Evaluator_BizDocDetail_Amount_ResetValue />
+					<Evaluator_BizDocDetail_Amount />
+					<Evaluator_BizDocDetail_Amount3 />
+				</Amount9>
+				<Amount>
+					<Evaluator_BizDocDetail_Amount />
+					<Evaluator_BizDocDetail_Amount3 />
+				</Amount>
+				<OriginalAmount>
+					<Evaluator_BizDocDetail_OriginalAmount3_ResetValue />
+					<Evaluator_BizDocDetail_OriginalAmount3 />
+					<Evaluator_BizDocDetail_Amount3_ResetValue />
+					<Evaluator_BizDocDetail_Amount3 />
+				</OriginalAmount>
+				<OriginalAmount3>
+					<Evaluator_BizDocDetail_OriginalAmount3 />
+					<Evaluator_BizDocDetail_Amount3 />
+				</OriginalAmount3>
+				<Amount3>
+					<Evaluator_BizDocDetail_Amount3 />
+				</Amount3>
+				<TaxRate>
+					<Evaluator_BizDocDetail_OriginalAmount />
+					<Evaluator_BizDocDetail_Amount />
+					<Evaluator_BizDocDetail_OriginalAmount3 />
+				</TaxRate>
+				<PriceIncludeTax>
+					<Evaluator_BizDocDetail_OriginalAmount />
+					<Evaluator_BizDocDetail_Amount />
+					<Evaluator_BizDocDetail_OriginalAmount3 />
+					<Evaluator_BizDocDetail_Amount3 />
+				</PriceIncludeTax>
+			</ColumnChanged>
+			<Evaluators>
+				<Evaluator_UpdateFromParentUnderChild>
+					<DataMember>IsRevisedPlan</DataMember>
+					<Value>PARENT.IsRevisedPlan</Value>
+				</Evaluator_UpdateFromParentUnderChild>
+				<Evaluator_BizDocDetail_OriginalAmount9>
+					<Assembly>Bravo.Bravo7.CustomControls</Assembly>
+					<ClassName>BravoMoneyRoundEvaluator</ClassName>
+					<DataMember>OriginalAmount9</DataMember>
+					<zMoneyExpr>OriginalUnitCost</zMoneyExpr>
+					<zQuantityExpr>Quantity9</zQuantityExpr>
+					<zExchangeRateOperatorExpr>ExchangeRateOperator</zExchangeRateOperatorExpr>
+					<zExchangeRateExpr>PARENT.ExchangeRate</zExchangeRateExpr>
+					<zDecimalsExpr>DecimalRound</zDecimalsExpr>
+				</Evaluator_BizDocDetail_OriginalAmount9>
+				<Evaluator_BizDocDetail_Amount9>
+					<Assembly>Bravo.Bravo7.CustomControls</Assembly>
+					<ClassName>BravoMoneyRoundEvaluator</ClassName>
+					<DataMember>Amount9</DataMember>
+					<zMoneyExpr>OriginalAmount9</zMoneyExpr>
+					<zExchangeRateOperatorExpr>ExchangeRateOperator</zExchangeRateOperatorExpr>
+					<zExchangeRateExpr>PARENT.ExchangeRate</zExchangeRateExpr>
+					<zDecimalsExpr>{VAR=M_Ma_Tte0_DecimalRound}</zDecimalsExpr>
+				</Evaluator_BizDocDetail_Amount9>
+				<Evaluator_BizDocDetail_OriginalAmount>
+					<DataMember>OriginalAmount</DataMember>
+					<Value>IIF(ISNULL(PriceIncludeTax,0)=0,OriginalAmount9,IIF(1+TaxRate=0,0,OriginalAmount9/(1+TaxRate)))</Value>
+					<zDecimalsExpr>DecimalRound</zDecimalsExpr>
+				</Evaluator_BizDocDetail_OriginalAmount>
+				<Evaluator_BizDocDetail_Amount>
+					<DataMember>Amount</DataMember>
+					<Value>IIF(ISNULL(PriceIncludeTax,0)=0,Amount9,IIF(1+TaxRate=0,0,Amount9/(1+TaxRate)))</Value>
+					<!-- 13/08/2013 ThắngĐQ: Fix lại round theo khai báo biến hệ thống -->
+					<zDecimalsExpr>{VAR=M_Ma_Tte0_DecimalRound}</zDecimalsExpr>
+				</Evaluator_BizDocDetail_Amount>
+				<Evaluator_BizDocDetail_OriginalUnitCost>
+					<DataMember>OriginalUnitCost</DataMember>
+					<Expr>ISNULL(OriginalUnitCost,0)=0 AND ISNULL(Quantity9,0)&lt;&gt;0 AND ISNULL(OriginalAmount9,0)&lt;&gt;0</Expr>
+					<Value>OriginalAmount9/Quantity9</Value>
+				</Evaluator_BizDocDetail_OriginalUnitCost>
+				<!-- 23/3/2015: Thăng sửa cho phép gõ lại Tiền thuế -->
+				<Evaluator_BizDocDetail_OriginalAmount3>
+					<Assembly>Bravo.Bravo7.CustomControls</Assembly>
+					<ClassName>BravoVATRoundEvaluator</ClassName>
+					<zDecimalsExpr>DecimalRound</zDecimalsExpr>
+					<zMoneyExpr>OriginalAmount</zMoneyExpr>
+					<zQuantityExpr>TaxRate</zQuantityExpr>
+					<Expr>ISNULL(TaxRate,0)&lt;&gt;0</Expr>
+					<DataMember>OriginalAmount3</DataMember>
+					<zExchangeRateExpr>PARENT.ExchangeRate</zExchangeRateExpr>
+					<zValueFormat>{0}+IIF(ISNULL(PriceIncludeTax,0)=0,0,OriginalAmount9-OriginalAmount-{0})</zValueFormat>
+				</Evaluator_BizDocDetail_OriginalAmount3>
+				<Evaluator_BizDocDetail_Amount3>
+					<Assembly>Bravo.Bravo7.CustomControls</Assembly>
+					<ClassName>BravoMoneyRoundEvaluator</ClassName>
+					<DataMember>Amount3</DataMember>
+					<nDecimals>0</nDecimals>
+					<zMoneyExpr>OriginalAmount3</zMoneyExpr>
+					<zExchangeRateOperatorExpr>ExchangeRateOperator</zExchangeRateOperatorExpr>
+					<zExchangeRateExpr>PARENT.ExchangeRate</zExchangeRateExpr>
+					<zDecimalsExpr>{VAR=M_Ma_Tte0_DecimalRound}</zDecimalsExpr>
+					<zValueFormat>{0}+IIF(ISNULL(PriceIncludeTax,0)=0,0,Amount9-Amount-{0})</zValueFormat>
+				</Evaluator_BizDocDetail_Amount3>
+				<Evaluator_BizDocDetail_Amount9_ResetValue>
+					<DataMember>Amount9</DataMember>
+					<Value>0</Value>
+				</Evaluator_BizDocDetail_Amount9_ResetValue>
+				<Evaluator_BizDocDetail_OriginalAmount_ResetValue>
+					<DataMember>OriginalAmount</DataMember>
+					<Value>0</Value>
+				</Evaluator_BizDocDetail_OriginalAmount_ResetValue>
+				<Evaluator_BizDocDetail_Amount_ResetValue>
+					<DataMember>Amount</DataMember>
+					<Value>0</Value>
+				</Evaluator_BizDocDetail_Amount_ResetValue>
+				<!-- 23/3/2015: Thăng sửa cho phép gõ lại Tiền thuế -->
+				<Evaluator_BizDocDetail_OriginalAmount3_ResetValue>
+					<DataMember>OriginalAmount3</DataMember>
+					<Expr>ISNULL(TaxRate,0)&lt;&gt;0</Expr>
+					<Value>0</Value>
+				</Evaluator_BizDocDetail_OriginalAmount3_ResetValue>
+				<!-- 23/3/2015: Thăng sửa cho phép gõ lại Tiền thuế -->
+				<Evaluator_BizDocDetail_Amount3_ResetValue>
+					<DataMember>Amount3</DataMember>
+					<Expr>ISNULL(TaxRate,0)&lt;&gt;0</Expr>
+					<Value>0</Value>
+				</Evaluator_BizDocDetail_Amount3_ResetValue>
+				<Evaluator_BizDocDetail_Unit_DefaultValue>
+					<DataMember>Unit</DataMember>
+					<Expr>ISNULL(Unit,'')='' AND ISNULL(_TempCol,'')=''</Expr>
+					<Value>Unit_Item</Value>
+				</Evaluator_BizDocDetail_Unit_DefaultValue>
+				<Evaluator_BizDocDetail_Description0_DefaultValue>
+					<DataMember>Description0</DataMember>
+					<Expr>ISNULL(Description0,'')='' AND ISNULL(_TempCol,'')=''</Expr>
+					<Value>Name_Item</Value>
+				</Evaluator_BizDocDetail_Description0_DefaultValue>
+				<Evaluator_BizDocDetail_ConvertRate9>
+					<DataMember>ConvertRate9</DataMember>
+					<Value>IIF(Unit=Unit_Item,1,IIF(Unit=Unit0,ConvertRate0,IIF(Unit=Unit1,ConvertRate1,IIF(Unit=Unit2,ConvertRate2,1))))</Value>
+				</Evaluator_BizDocDetail_ConvertRate9>
+				<Evaluator_BizDocDetail_Quantity>
+					<DataMember>Quantity</DataMember>
+					<Value>ISNULL(Quantity9,0)*ConvertRate9</Value>
+				</Evaluator_BizDocDetail_Quantity>
+				<Evaluator_BizDocDetail_TempCol_Reset>
+					<DataMember>_TempCol</DataMember>
+					<Value>NULL</Value>
+				</Evaluator_BizDocDetail_TempCol_Reset>
+			</Evaluators>
+			<DefaultValues>
+				<BranchCode>A03</BranchCode>
+			</DefaultValues>
+			<ServerUpdating>
+				<Evaluators>
+					<Evaluator_Detail_DocDate_DefaultValueFromParent>
+						<DataMember>DocDate</DataMember>
+						<Value>PARENT.DocDate</Value>
+					</Evaluator_Detail_DocDate_DefaultValueFromParent>
+					<Evaluator_Detail_CustomerCode_DefaultValueFromParent>
+						<DataMember>CustomerCode</DataMember>
+						<Value>PARENT.CustomerCode</Value>
+					</Evaluator_Detail_CustomerCode_DefaultValueFromParent>
+					<Evaluator_Detail_Description_AutoValue>
+						<DataMember>Description</DataMember>
+						<Value>IIF(ISNULL(Description0,'')&lt;&gt;ISNULL(Name_Item,''), Description0, '')</Value>
+					</Evaluator_Detail_Description_AutoValue>
+					<Evaluator_Detail_UnitCost_AutoValue>
+						<Assembly>Bravo.Bravo7.CustomControls</Assembly>
+						<ClassName>BravoMoneyRoundEvaluator</ClassName>
+						<DataMember>UnitCost</DataMember>
+						<zMoneyExpr>OriginalUnitCost</zMoneyExpr>
+						<zExchangeRateOperatorExpr>ExchangeRateOperator</zExchangeRateOperatorExpr>
+						<zExchangeRateExpr>PARENT.ExchangeRate</zExchangeRateExpr>
+						<zDecimalsExpr>{VAR=M_Ma_Tte0_DecimalRound}</zDecimalsExpr>
+					</Evaluator_Detail_UnitCost_AutoValue>
+				</Evaluators>
+			</ServerUpdating>
+		</ChildTable_Detail>
+	</Tables>
+	<navigator>
+		<DocStatusValue>
+			<bindingMembers>
+				<Lock>Lock</Lock>
+				<IsCancelled>IsCancelled</IsCancelled>
+			</bindingMembers>
+		</DocStatusValue>
+	</navigator>
+	<panelParent>
+		<Cols>
+			<Column_1>
+				<SizeType>2</SizeType>
+				<Width>20</Width>
+			</Column_1>
+			<Column_2>
+				<SizeType>2</SizeType>
+				<Width>60</Width>
+			</Column_2>
+			<Column_6>
+				<SizeType>2</SizeType>
+				<Width>30</Width>
+			</Column_6>
+			<Column_7>
+				<SizeType>1</SizeType>
+				<Width>90</Width>
+			</Column_7>
+		</Cols>
+		<Controls>
+			<Control_BravoTitleControl>
+				<Assembly>Bravo.Bravo7.CustomControls</Assembly>
+				<ClassName>BravoTitleControl</ClassName>
+				<DataMember>DocCode</DataMember>
+				<bHideValueMember>True</bHideValueMember>
+				<LookupKey>DmCt</LookupKey>
+				<Row />
+				<Column>0</Column>
+				<ColumnSpan>3</ColumnSpan>
+				<bindingMembers>
+					<DocStatus_Ct>DocStatus</DocStatus_Ct>
+				</bindingMembers>
+			</Control_BravoTitleControl>
+			<Control_panelDate>
+				<Anchor>9</Anchor>
+				<Cols>
+					<Column_2>
+						<SizeType>1</SizeType>
+						<Width>14</Width>
+					</Column_2>
+				</Cols>
+				<Column>4</Column>
+				<ColumnSpan>5</ColumnSpan>
+				<Controls>
+					<Control_lblDocDate>
+						<Text>
+							<Vietnamese>Ngày</Vietnamese>
+							<English>Date</English>
+							<Chinese>日期</Chinese>
+							<Japanese>日付</Japanese>
+							<Custom>날짜.</Custom>
+							<French>Control_lblDocDate</French>
+						</Text>
+						<Row />
+						<Column>0</Column>
+					</Control_lblDocDate>
+					<Control_txtDocDate>
+						<ClassName>BravoDateInputBox</ClassName>
+						<DataMember>DocDate</DataMember>
+						<MinWidth>90</MinWidth>
+						<Column>1</Column>
+						<ColumnSpan>2</ColumnSpan>
+					</Control_txtDocDate>
+					<Control_lblDocNo>
+						<Text>
+							<Vietnamese>Số kế hoạch </Vietnamese>
+							<English>Inquiry No</English>
+							<Chinese>数</Chinese>
+							<Japanese>数</Japanese>
+							<Custom>번호.</Custom>
+							<French>Control_lblDocNo</French>
+						</Text>
+						<Column>3</Column>
+					</Control_lblDocNo>
+					<Control_txtDocNo>
+						<ClassName>BravoKeyInputBox</ClassName>
+						<DataMember>DocNo</DataMember>
+						<Column>4</Column>
+						<ColumnSpan>3</ColumnSpan>
+					</Control_txtDocNo>
+				</Controls>
+			</Control_panelDate>
+			<Control_lblDeptCode>
+				<Text>
+					<Vietnamese>Bộ phận</Vietnamese>
+					<English>Customer</English>
+					<Chinese>顾客</Chinese>
+					<Japanese>顧客</Japanese>
+					<Custom>고객.</Custom>
+					<French>Control_lblCustomerCode</French>
+				</Text>
+				<Row />
+				<Column>0</Column>
+			</Control_lblDeptCode>
+			<Control_lookupDeptCode>
+				<ClassName>BravoLookupBox</ClassName>
+				<DataMember>DeptCode</DataMember>
+				<LookupKey>Dept</LookupKey>
+				<zPostFilterExpr>IsGroup=0</zPostFilterExpr>
+				<Column>1</Column>
+				<ColumnSpan>4</ColumnSpan>
+			</Control_lookupDeptCode>
+			<Control_lblEmployeeCode>
+				<Text>
+					<Vietnamese>Nhân viên</Vietnamese>
+					<English>Customer</English>
+					<Chinese>顾客</Chinese>
+					<Japanese>顧客</Japanese>
+					<Custom>고객.</Custom>
+					<French>Control_lblCustomerCode</French>
+				</Text>
+				<Row />
+				<Column>0</Column>
+			</Control_lblEmployeeCode>
+			<Control_lookupEmployeeCode>
+				<ClassName>BravoLookupBox</ClassName>
+				<DataMember>EmployeeCode</DataMember>
+				<LookupKey>Employee</LookupKey>
+				<zPostFilterExpr>IsGroup=0</zPostFilterExpr>
+				<Column>1</Column>
+				<ColumnSpan>4</ColumnSpan>
+			</Control_lookupEmployeeCode>
+			<Control_lblDescription>
+				<Text>
+					<Vietnamese>Nội dung</Vietnamese>
+					<English>Content</English>
+					<Chinese>内容</Chinese>
+					<Japanese>コンテンツ</Japanese>
+					<Custom>콘텐츠.</Custom>
+					<French>Control_lblDescription</French>
+				</Text>
+				<Row />
+				<Column>0</Column>
+			</Control_lblDescription>
+			<Control_txtDescription>
+				<Anchor>15</Anchor>
+				<ClassName>BravoTextBox</ClassName>
+				<DataMember>Description</DataMember>
+				<Multiline>True</Multiline>
+				<Column>1</Column>
+				<RowSpan>4</RowSpan>
+				<ColumnSpan>4</ColumnSpan>
+			</Control_txtDescription>
+		</Controls>
+	</panelParent>
+	<grdChild_ChildTable_Detail>
+		<Text>
+			<Vietnamese>Chi tiết</Vietnamese>
+			<English>Detail</English>
+			<Chinese>细节</Chinese>
+			<Japanese>詳細</Japanese>
+			<Custom>가까이서 보세요.</Custom>
+			<French>grdChild_ChildTable_Detail</French>
+		</Text>
+		<Cols>
+			<Column_PhanXuong>
+				<Editor>
+					<ClassName>BravoLookupBox</ClassName>
+					<LookupKey>Class</LookupKey>
+					<zLoadFilterExpr>ParentCode='PHANXUONG'</zLoadFilterExpr>
+				</Editor>
+				<Name>PhanXuong</Name>
+				<Style>TextAlign:LeftTop;WordWrap:True;</Style>
+				<Width>80</Width>
+				<Rows>
+					<Row_0>
+						<Caption>
+							<Vietnamese>Phân xưởng</Vietnamese>
+							<English>SO</English>
+							<Chinese>销售订单</Chinese>
+							<Japanese>受注</Japanese>
+							<Custom>판매 주문.</Custom>
+						</Caption>
+						<Style>UserData:PhanXuong;</Style>
+					</Row_0>
+				</Rows>
+			</Column_PhanXuong>
+			<Column_SttLSanXuat>
+				<Editor>
+					<bindingMembers>
+						<DocNo>(DocInfo_Lsx)</DocNo>
+					</bindingMembers>
+					<ClassName>BravoLookupBox</ClassName>
+					<LookupKey>SttLSanXuat</LookupKey>
+					<zLoadFilterExpr>Closed=0</zLoadFilterExpr>
+				</Editor>
+				<Name>SttLSanXuat</Name>
+				<Style>TextAlign:LeftTop;WordWrap:True;</Style>
+				<Width>110</Width>
+				<Rows>
+					<Row_0>
+						<Caption>
+							<Vietnamese>Lệnh SX</Vietnamese>
+							<English>SO</English>
+							<Chinese>销售订单</Chinese>
+							<Japanese>受注</Japanese>
+							<Custom>판매 주문.</Custom>
+						</Caption>
+						<Style>UserData:SO;</Style>
+					</Row_0>
+				</Rows>
+			</Column_SttLSanXuat>
+			<Column_ItemCode>
+				<Editor>
+					<bindingMembers>
+						<Name>(Name_Item)</Name>
+						<Unit>(Unit_Item)</Unit>
+						<Unit0>(Unit0)</Unit0>
+						<ConvertRate0>(ConvertRate0)</ConvertRate0>
+						<Unit1>(Unit1)</Unit1>
+						<ConvertRate1>(ConvertRate1)</ConvertRate1>
+						<Unit2>(Unit2)</Unit2>
+						<ConvertRate2>(ConvertRate2)</ConvertRate2>
+					</bindingMembers>
+					<ClassName>BravoLookupBox</ClassName>
+					<LookupKey>Item</LookupKey>
+					<zLoadFilterExpr>Code IN (SELECT ItemCode FROM B20LSanXuat WHERE SttLSanXuat={EXPR=SttLSanXuat})</zLoadFilterExpr>
+				</Editor>
+				<Name>ItemCode</Name>
+				<Style>TextAlign:LeftTop;</Style>
+				<Width>100</Width>
+				<Rows>
+					<Row_0>
+						<Caption>
+							<Vietnamese>Sản phẩm</Vietnamese>
+							<English>Item</English>
+							<Chinese>项目</Chinese>
+							<Japanese>アイテム</Japanese>
+							<Custom>항목.</Custom>
+						</Caption>
+					</Row_0>
+				</Rows>
+			</Column_ItemCode>
+			<Column_Description0>
+				<Editor />
+				<Name>Description0</Name>
+				<Style>TextAlign:LeftTop;</Style>
+				<Width>290</Width>
+				<Rows>
+					<Row_0>
+						<Caption>
+							<Vietnamese>Tên sản phẩm</Vietnamese>
+							<English>Description</English>
+							<Chinese>描述</Chinese>
+							<Japanese>説明</Japanese>
+							<Custom>설명.</Custom>
+						</Caption>
+					</Row_0>
+				</Rows>
+			</Column_Description0>
+			<Column_Unit>
+				<Editor>
+					<Assembly>Bravo.Bravo7.CustomControls</Assembly>
+					<ClassName>BravoDataColumnComboBox</ClassName>
+					<Expr>LEN(TRIM(ISNULL(Unit0,''))+TRIM(ISNULL(Unit1,''))+TRIM(ISNULL(Unit2,'')))&gt;0</Expr>
+					<zDataColumnList>Unit_Item,Unit0,Unit1,Unit2</zDataColumnList>
+				</Editor>
+				<Name>Unit</Name>
+				<Style>TextAlign:LeftTop;</Style>
+				<Width>45</Width>
+				<Rows>
+					<Row_0>
+						<Caption>
+							<Vietnamese>Đvt</Vietnamese>
+							<English>Unit</English>
+							<Chinese>单位</Chinese>
+							<Japanese>ユニット</Japanese>
+							<Custom>단위</Custom>
+						</Caption>
+					</Row_0>
+				</Rows>
+			</Column_Unit>
+			<Column_RequestQuantity>
+				<Name>RequestQuantity</Name>
+				<Style>TextAlign:RightTop;BackColor:AntiqueWhite;Font:,,style=Bold;</Style>
+				<Width>100</Width>
+				<Rows>
+					<Row_0>
+						<Caption>
+							<Vietnamese>Yêu cầu (LSX)</Vietnamese>
+							<English>Quantity</English>
+							<Chinese>数量</Chinese>
+							<Japanese>数量</Japanese>
+							<Custom>양이냐.</Custom>
+							<French />
+						</Caption>
+					</Row_0>
+				</Rows>
+			</Column_RequestQuantity>
+			<Column_ReceiptQuantity>
+				<Name>ReceiptQuantity</Name>
+				<Style>TextAlign:RightTop;BackColor:AntiqueWhite;Font:,,style=Bold;</Style>
+				<Width>100</Width>
+				<Rows>
+					<Row_0>
+						<Caption>
+							<Vietnamese>Lũy kế thực hiện</Vietnamese>
+							<English>Quantity</English>
+							<Chinese>数量</Chinese>
+							<Japanese>数量</Japanese>
+							<Custom>양이냐.</Custom>
+							<French />
+						</Caption>
+					</Row_0>
+				</Rows>
+			</Column_ReceiptQuantity>
+			<Column_Quantity9>
+				<Editor>
+					<ClassName>BravoQuantityInputBox</ClassName>
+				</Editor>
+				<Name>Quantity9</Name>
+				<Style>TextAlign:RightTop;Font:,,style=Bold;</Style>
+				<Width>100</Width>
+				<Rows>
+					<Row_0>
+						<Caption>
+							<Vietnamese>SL kế hoạch tiếp theo</Vietnamese>
+							<English>Quantity</English>
+							<Chinese>数量</Chinese>
+							<Japanese>数量</Japanese>
+							<Custom>양이냐.</Custom>
+							<French />
+						</Caption>
+					</Row_0>
+				</Rows>
+			</Column_Quantity9>
+			<Column_Note>
+				<Editor>
+					<ClassName>BravoLookupBox</ClassName>
+					<LookupKey>Process</LookupKey>
+					<lookupMode>ChecklistingValueMember</lookupMode>
+				</Editor>
+				<Name>Note</Name>
+				<Style>TextAlign:LeftTop;WordWrap:True;</Style>
+				<Width>200</Width>
+				<Rows>
+					<Row_0>
+						<Caption>
+							<Vietnamese>Công đoạn sản xuất</Vietnamese>
+							<English>Note</English>
+							<Chinese>备注</Chinese>
+							<Japanese>発言</Japanese>
+							<Custom>레마르크.</Custom>
+							<French />
+						</Caption>
+					</Row_0>
+				</Rows>
+			</Column_Note>
+			<Column_EstimatedTimeDelivery>
+				<Editor>
+					<ClassName>BravoDateInputBox</ClassName>
+				</Editor>
+				<Name>EstimatedTimeDelivery</Name>
+				<Width>90</Width>
+				<Rows>
+					<Row_0>
+						<Caption>
+							<Vietnamese>Dự kiến hoàn thành</Vietnamese>
+							<English>E.T.D</English>
+							<Chinese>预产期</Chinese>
+							<Japanese>出産予定</Japanese>
+							<Custom>배달 예측. </Custom>
+							<French />
+						</Caption>
+					</Row_0>
+				</Rows>
+			</Column_EstimatedTimeDelivery>
+			<Column_Remark>
+				<Editor>
+					<Multiline>True</Multiline>
+				</Editor>
+				<Name>Remark</Name>
+				<Style>TextAlign:LeftTop;WordWrap:True;</Style>
+				<Width>300</Width>
+				<Rows>
+					<Row_0>
+						<Caption>
+							<Vietnamese>Ghi chú</Vietnamese>
+							<English>Notes</English>
+							<Chinese>备注</Chinese>
+							<Japanese>発言</Japanese>
+							<Custom>레마르크.</Custom>
+							<French />
+						</Caption>
+					</Row_0>
+				</Rows>
+			</Column_Remark>
+			<Column_RequaimentofPs>
+				<Editor>
+					<Multiline>True</Multiline>
+				</Editor>
+				<Name>RequaimentofPs</Name>
+				<Style>TextAlign:LeftTop;WordWrap:True;</Style>
+				<Width>300</Width>
+				<Rows>
+					<Row_0>
+						<Caption>
+							<Vietnamese>Yêu cầu ký thuật</Vietnamese>
+							<English>Required to sign art</English>
+							<Chinese>备注</Chinese>
+							<Japanese>発言</Japanese>
+							<Custom>레마르크.</Custom>
+							<French />
+						</Caption>
+					</Row_0>
+				</Rows>
+			</Column_RequaimentofPs>
+			<Column_IsRevisedPlan>
+				<Editor>
+					<ClassName>BravoCheckBox</ClassName>
+				</Editor>
+				<Name>IsRevisedPlan</Name>
+				<Width>0</Width>
+				<Rows>
+					<Row_0>
+						<Caption>
+							<Vietnamese>IsRevisedPlan</Vietnamese>
+							<English>Item</English>
+							<Chinese>项目</Chinese>
+							<Japanese>アイテム</Japanese>
+							<Custom>항목.</Custom>
+						</Caption>
+					</Row_0>
+				</Rows>
+			</Column_IsRevisedPlan>
+		</Cols>
+		<detectFirstColValueToDeleteRow>2</detectFirstColValueToDeleteRow>
+	</grdChild_ChildTable_Detail>
+	<panelSummary>
+		<Cols>
+			<Column_1>
+				<SizeType>Percent</SizeType>
+				<Width>100</Width>
+			</Column_1>
+			<Column_2>
+				<SizeType>Percent</SizeType>
+				<Width>5</Width>
+			</Column_2>
+		</Cols>
+		<Controls />
+	</panelSummary>
+	<toolStrip1>
+		<Items>
+			<ShowEditingPanel />
+			<ShowPrintSettingPanel>
+				<DisplayStyle>2</DisplayStyle>
+			</ShowPrintSettingPanel>
+			<_SEPARATOR_0 />
+			<NewSelector>
+				<DisplayStyle>2</DisplayStyle>
+			</NewSelector>
+			<_SEPARATOR_1 />
+			<Edit>
+				<DisplayStyle>2</DisplayStyle>
+			</Edit>
+			<_SEPARATOR_2 />
+			<Save>
+				<DisplayStyle>2</DisplayStyle>
+			</Save>
+			<_SEPARATOR_3 />
+			<Refresh>
+				<DisplayStyle>2</DisplayStyle>
+			</Refresh>
+			<_SEPARATOR_4 />
+			<Calculator>
+				<DisplayStyle>2</DisplayStyle>
+			</Calculator>
+			<_SEPARATOR_5 />
+			<Attach_Document>
+				<zDataTable>vB30BizDoc_Edit</zDataTable>
+				<zDataMember>MultipleFile</zDataMember>
+			</Attach_Document>
+			<Translate>
+				<DisplayStyle>2</DisplayStyle>
+			</Translate>
+			<CloseWindow />
+			<SelectLayout>
+				<Alignment>1</Alignment>
+			</SelectLayout>
+		</Items>
+	</toolStrip1>
+	<bAllowNestingEvaluators>True</bAllowNestingEvaluators>
+</root>
